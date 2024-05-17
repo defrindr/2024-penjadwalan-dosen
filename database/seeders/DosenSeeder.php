@@ -3,8 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Dosen;
-use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DosenSeeder extends Seeder
@@ -20,7 +18,7 @@ class DosenSeeder extends Seeder
             'nama_dosen' => 'Budi Harijanto, ST., M.MKom.',
             'telp' => '08123313847',
             'alamat' => 'Batu',
-            'user_id' => 2
+            'user_id' => 2,
         ]);
 
         Dosen::create([
@@ -28,7 +26,7 @@ class DosenSeeder extends Seeder
             'nama_dosen' => 'Mungki Astiningrum, ST., M.Kom.',
             'telp' => '08123313847',
             'alamat' => 'Batu',
-            'user_id' => 3
+            'user_id' => 3,
         ]);
     }
 }

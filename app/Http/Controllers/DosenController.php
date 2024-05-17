@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Dosen;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Pagination\Paginator;
-
 
 class DosenController extends Controller
 {
@@ -17,10 +15,11 @@ class DosenController extends Controller
     {
         $user = Auth::user();
         $idUser = auth()->user()->id;
-        
-        $jumlahDosen = Dosen::count(); 
+
+        $jumlahDosen = Dosen::count();
 
         $dtDosen = Dosen::paginate(5);
+
         return view('dosen')->with('dtDosen', $dtDosen)->with('jumlahDosen', $jumlahDosen)->with('user', $user);
 
     }
@@ -39,7 +38,7 @@ class DosenController extends Controller
     public function store(Request $request)
     {
         Dosen::create([
-            'NIP' => $request->NIP,
+            'nip' => $request->nip,
             'nama_dosen' => $request->nama_dosen,
             'telp' => $request->telp,
             'alamat' => $request->alamat,
@@ -62,7 +61,8 @@ class DosenController extends Controller
     public function edit($id)
     {
         $dosen = Dosen::findorfail($id);
-        return view('editDosen',compact('dosen'));
+
+        return view('editDosen', compact('dosen'));
     }
 
     /**
@@ -72,6 +72,7 @@ class DosenController extends Controller
     {
         $dosen = Dosen::findorfail($id);
         $dosen->update($request->all());
+
         return redirect('dosen');
     }
 
@@ -82,13 +83,15 @@ class DosenController extends Controller
     {
         $dosen = Dosen::findorfail($id);
         $dosen->delete();
+
         return redirect('dosen');
     }
 
     public function search(Request $request)
-{
-    $search = $request->get('search');
-    $dtDosen = Dosen::where('nama_dosen', 'like', '%' . $search . '%')->paginate(10);
-    return view('dosen', compact('dtDosen'));
-}
+    {
+        $search = $request->get('search');
+        $dtDosen = Dosen::where('nama_dosen', 'like', '%'.$search.'%')->paginate(10);
+
+        return view('dosen', compact('dtDosen'));
+    }
 }

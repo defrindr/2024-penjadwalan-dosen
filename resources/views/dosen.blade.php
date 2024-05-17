@@ -45,12 +45,12 @@
               <td>{{ $d->alamat }}</td>
               <td class="text-center"> <!-- Menjadikan sel aksi menjadi terpusat -->
                 <!-- Edit Button -->
-                <a href="{{ route('editDosen', $d->NIP)}}" class="btn btn-sm btn-primary">
+                <a href="{{ route('editDosen', $d->nip)}}" class="btn btn-sm btn-primary">
                   <i class="fas fa-edit"></i> <!-- Icon edit -->
                   Edit
                 </a>
                 <!-- Delete Button -->
-                <a href="{{ route('deleteDosen', $d->NIP)}}" class="btn btn-sm btn-danger">
+                <a href="{{ route('deleteDosen', $d->nip)}}" class="btn btn-sm btn-danger">
                   <i class="fas fa-trash-alt"></i> <!-- Icon hapus -->
                   Delete
                 </a>

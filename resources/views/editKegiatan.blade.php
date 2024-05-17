@@ -19,12 +19,12 @@
             @csrf
             <div class="card-body">
               <div class="form-group row">
-                <label for="NIP" class="col-sm-2 col-form-label">Nama Dosen:</label>
+                <label for="nip" class="col-sm-2 col-form-label">Nama Dosen:</label>
                 <div class="col-sm-10">
-                  <select class="form-control" id="NIP" name="NIP" required>
+                  <select class="form-control" id="nip" name="nip" required>
                     <option disabled value="">Pilih Nama Dosen</option>
                     @foreach ($dosen as $d)
-                    <option value="{{ $d->NIP }}" {{ $d->NIP == $kegiatan->NIP ? 'selected' : '' }}>{{ $d->nama_dosen }}</option>
+                    <option value="{{ $d->nip }}" {{ $d->nip == $kegiatan->nip ? 'selected' : '' }}>{{ $d->nama_dosen }}</option>
                     @endforeach
                   </select>
                 </div>

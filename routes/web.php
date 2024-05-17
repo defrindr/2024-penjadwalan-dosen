@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\DosenController;
 use App\Http\Controllers\KegiatanDosenController;
 use App\Http\Controllers\LogoutController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 // dd(bcrypt("password"));
 Route::get('/', function () {

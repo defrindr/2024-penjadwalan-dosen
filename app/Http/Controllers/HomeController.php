@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Pagination\Paginator;
 
 class HomeController extends Controller
 {
@@ -38,24 +37,27 @@ class HomeController extends Controller
 
     }
 
-        function admin(){
-            $user = Auth::user();
-            $idUser = auth()->user()->id;
-            
-            return view('home', ['user' => $user]);
-        }
-    
-        function user(){
-            $user = Auth::user();
-            $idUser = auth()->user()->id;
-    
-            return view('home_user', ['user' => $user]);
-        }
+    public function admin()
+    {
+        $user = Auth::user();
+        $idUser = auth()->user()->id;
 
-        function pimpinan(){
-            $user = Auth::user();
-            $idUser = auth()->user()->id;
-    
-            return view('home_user', ['user' => $user]);
-        }
+        return view('home', ['user' => $user]);
+    }
+
+    public function user()
+    {
+        $user = Auth::user();
+        $idUser = auth()->user()->id;
+
+        return view('home_user', ['user' => $user]);
+    }
+
+    public function pimpinan()
+    {
+        $user = Auth::user();
+        $idUser = auth()->user()->id;
+
+        return view('home_user', ['user' => $user]);
+    }
 }

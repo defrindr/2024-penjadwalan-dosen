@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Kegiatan;
 use Illuminate\Database\Seeder;
 
 class KegiatanSeeder extends Seeder
@@ -12,6 +12,14 @@ class KegiatanSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        Kegiatan::create([
+            'NIP' => '196201051990031002',
+            'tugas' => 'Tugas Coba',
+            'nama_kegiatan' => 'Kegiatan test',
+            'tanggal' => '2023-01-04',
+            'waktu_mulai' => '10:00:00',
+            'waktu_selesai' => '14:00:00',
+            'surat_tugas' => null,
+        ]);
     }
 }

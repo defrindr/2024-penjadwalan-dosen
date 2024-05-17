@@ -20,9 +20,9 @@
                 @csrf
               <div class="card-body">
                 <div class="form-group row">
-                  <label for="NIP" class="col-sm-2 col-form-label">NIP:</label>
+                  <label for="nip" class="col-sm-2 col-form-label">nip:</label>
                   <div class="col-sm-10">
-                    <input type="int" class="form-control" id="NIP" name="NIP" Placeholder="NIP" required>
+                    <input type="int" class="form-control" id="nip" name="nip" Placeholder="nip" required>
                   </div>
                 </div>
 
