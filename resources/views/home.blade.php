@@ -210,13 +210,13 @@
         <script>
             const ctx2 = document.getElementById('chart2');
             new Chart(ctx2, {
-                type: 'bar',
+                type: 'doughnut',
                 data: {
                     labels: {!! json_encode($listDosen2) !!},
                     datasets: [{
                         label: '# dari Kegiatan',
                         data: {!! json_encode($listNilai2) !!},
-                        backgroundColor: '#C44628',
+                        backgroundColor: ['#C44628','#F00', '#25A512', '#81DE87', '#3245DE'],
                         borderWidth: 1
                     }]
                 },
