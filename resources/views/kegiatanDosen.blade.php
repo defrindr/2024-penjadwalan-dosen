@@ -8,10 +8,13 @@
         <div class="container-fluid">
             <div class="card">
                 <div class="card-header">
-                    <a href="{{ route('tambahKegiatan') }}" class="btn btn-success btn-sm"> <!-- Tambahkan kelas btn-sm -->
-                        <i class="fas fa-plus-square"></i> <!-- Ikon -->
-                        <span> Tambah Kegiatan</span> <!-- Teks -->
-                    </a>
+                    @if (auth()->user()->role !== 'pimpinan')
+                        <a href="{{ route('tambahKegiatan') }}" class="btn btn-success btn-sm">
+                            <!-- Tambahkan kelas btn-sm -->
+                            <i class="fas fa-plus-square"></i> <!-- Ikon -->
+                            <span> Tambah Kegiatan</span> <!-- Teks -->
+                        </a>
+                    @endif
                 </div>
                 <!-- /.card-header -->
                 <div class="card-body">
