@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\WaSender;
 use App\Models\Dosen;
 use App\Models\Kegiatan;
 use Illuminate\Database\Eloquent\Model;
@@ -13,16 +14,44 @@ class KegiatanDosenController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        $dosen = $user->dosen;
         $idUser = auth()->user()->id;
 
         // Mengambil data kegiatan dengan paginasi
-        $dtKegiatan = Kegiatan::paginate(5);
+        if ($dosen) {
+            $dtKegiatan = Kegiatan::where('nip', $dosen->nip);
+        } else {
+            $dtKegiatan = Kegiatan::query();
+        }
+
+        if ($request->has('daterange') && $request->get('daterange')) {
+            $tanggal = explode(" - ", $request->get('daterange'));
+            $tanggalMulai = date("Y-m-d", strtotime($tanggal[0]));
+            $tanggalSelesai = date("Y-m-d", strtotime($tanggal[1]));
+            // dd($dtKegiatan->toSql());
+            $dtKegiatan->whereBetween('tanggal', [$tanggalMulai, $tanggalSelesai]);
+        }
+
+        if ($request->has('tugas') && $request->get('tugas')) {
+            $dtKegiatan->where('tugas', $request->get('tugas'));
+        }
+
+        if ($request->has('nip') && $request->get('nip')) {
+            $dtKegiatan->where('nip', $request->get('nip'));
+        }
+
+        if ($request->has('search')) {
+            $keyword = $request->get('search');
+            $dtKegiatan->where('nama_kegiatan', 'like', "%$keyword%");
+        }
+
+        $dtKegiatan = $dtKegiatan->orderBy('created_at', 'desc')->paginate(5);
 
         // Memastikan bahwa $dtKegiatan adalah objek LengthAwarePaginator
-        if (! ($dtKegiatan instanceof \Illuminate\Pagination\LengthAwarePaginator)) {
+        if (!($dtKegiatan instanceof \Illuminate\Pagination\LengthAwarePaginator)) {
             // Jika bukan objek LengthAwarePaginator, tampilkan pesan error
             return redirect()->back()->with('error', 'Failed to fetch data.');
         }
@@ -56,7 +85,7 @@ class KegiatanDosenController extends Controller
             $namaFile = $file->getClientOriginalName();
 
             // Memindahkan file ke folder yang ditentukan
-            $file->move(public_path().'/pdf', $namaFile);
+            $file->move(public_path() . '/pdf', $namaFile);
         } else {
             // Tidak ada file yang diunggah, set "surat_tugas" menjadi null
             $namaFile = null;
@@ -74,6 +103,13 @@ class KegiatanDosenController extends Controller
 
         // Menyimpan model Kegiatan
         $dtKegiatan->save();
+
+        $user = auth()->user();
+        $dosen = Dosen::where('nip', $request->nip)->first();
+        if ($user->role !== "user" && $dosen) {
+            WaSender::send($dosen->telp, "Ada kegiatan baru untuk anda dari {$request->tugas} !!\n\nKreator: {$user->name}");
+        }
+
 
         return redirect('kegiatanDosen');
     }
@@ -125,16 +161,16 @@ class KegiatanDosenController extends Controller
             $file = $request->file('surat_tugas');
 
             // Membuat nama unik untuk file yang akan disimpan
-            $namaFile = uniqid().'_'.$file->getClientOriginalName();
+            $namaFile = uniqid() . '_' . $file->getClientOriginalName();
 
             // Memindahkan file ke direktori yang ditentukan
-            $file->move(public_path().'/pdf', $namaFile);
+            $file->move(public_path() . '/pdf', $namaFile);
 
             // Menghapus file lama jika ada dan menggantikan dengan yang baru
-            if (! empty($awal)) {
+            if (!empty($awal)) {
                 // Hapus file lama
-                if (file_exists(public_path('pdf/'.$awal))) {
-                    unlink(public_path('pdf/'.$awal));
+                if (file_exists(public_path('pdf/' . $awal))) {
+                    unlink(public_path('pdf/' . $awal));
                 }
             }
 
@@ -164,7 +200,7 @@ class KegiatanDosenController extends Controller
         $date = $request->get('date');
 
         // Query pencarian data dosen berdasarkan nama
-        $dtDosen = Dosen::where('nama_dosen', 'like', '%'.$search.'%')->get();
+        $dtDosen = Dosen::where('nama_dosen', 'like', '%' . $search . '%')->get();
 
         // Mengambil nip dari hasil pencarian dosen
         $nipDosen = $dtDosen->pluck('nip')->toArray();

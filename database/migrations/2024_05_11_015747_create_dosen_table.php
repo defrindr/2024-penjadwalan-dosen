@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('nama_dosen', 100);
             $table->string('telp', 50);
             $table->string('alamat', 100);
-            $table->foreignId('user_id')->references('id')->on('users');
+            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

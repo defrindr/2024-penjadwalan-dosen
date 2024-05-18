@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Dosen;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class DosenController extends Controller
 {
@@ -20,8 +21,7 @@ class DosenController extends Controller
 
         $dtDosen = Dosen::paginate(5);
 
-        return view('dosen')->with('dtDosen', $dtDosen)->with('jumlahDosen', $jumlahDosen)->with('user', $user);
-
+        return view('dosen', compact('user', 'jumlahDosen', 'dtDosen'));
     }
 
     /**
@@ -37,12 +37,24 @@ class DosenController extends Controller
      */
     public function store(Request $request)
     {
-        Dosen::create([
-            'nip' => $request->nip,
-            'nama_dosen' => $request->nama_dosen,
-            'telp' => $request->telp,
-            'alamat' => $request->alamat,
+        $validator = Validator::make($request->all(), [
+            'nip' => 'required|numeric',
+            'nama_dosen' => 'required',
+            'email' => 'required',
+            'password' => 'required|min:6',
+            'telp' => 'required',
+            'alamat' => 'required',
         ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->with('error', $validator->messages()->first())->withInput();
+        }
+
+        try {
+            Dosen::addNewDosen($validator->validated());
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Gagal menambahkan data')->withInput();
+        }
 
         return redirect('dosen');
     }
@@ -70,8 +82,24 @@ class DosenController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $dosen = Dosen::findorfail($id);
-        $dosen->update($request->all());
+        $validator = Validator::make($request->all(), [
+            'nip' => 'required|numeric',
+            'nama_dosen' => 'required',
+            'email' => 'required',
+            'password' => 'nullable|min:6',
+            'telp' => 'required',
+            'alamat' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->with('error', $validator->messages()->first())->withInput();
+        }
+
+        try {
+            Dosen::editDosen($id, $validator->validated());
+        } catch (\Throwable $th) {
+            return redirect()->back()->with('error', 'Gagal mengubah data')->withInput();
+        }
 
         return redirect('dosen');
     }
@@ -82,7 +110,9 @@ class DosenController extends Controller
     public function destroy(string $id)
     {
         $dosen = Dosen::findorfail($id);
+        $user = $dosen->user;
         $dosen->delete();
+        $user->delete();
 
         return redirect('dosen');
     }
@@ -90,7 +120,7 @@ class DosenController extends Controller
     public function search(Request $request)
     {
         $search = $request->get('search');
-        $dtDosen = Dosen::where('nama_dosen', 'like', '%'.$search.'%')->paginate(10);
+        $dtDosen = Dosen::where('nama_dosen', 'like', '%' . $search . '%')->paginate(10);
 
         return view('dosen', compact('dtDosen'));
     }

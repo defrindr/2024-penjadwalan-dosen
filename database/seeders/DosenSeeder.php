@@ -16,7 +16,8 @@ class DosenSeeder extends Seeder
         Dosen::create([
             'NIP' => '196201051990031002',
             'nama_dosen' => 'Budi Harijanto, ST., M.MKom.',
-            'telp' => '08123313847',
+            // 'telp' => '08123313847',
+            'telp' => purify_phone_number("085604845437"),
             'alamat' => 'Batu',
             'user_id' => 2,
         ]);
@@ -24,7 +25,8 @@ class DosenSeeder extends Seeder
         Dosen::create([
             'NIP' => '197710302005012001',
             'nama_dosen' => 'Mungki Astiningrum, ST., M.Kom.',
-            'telp' => '08123313847',
+            // 'telp' => '08123313847',
+            'telp' => purify_phone_number("085604845437"),
             'alamat' => 'Batu',
             'user_id' => 3,
         ]);

@@ -14,7 +14,13 @@ return new class extends Migration
         Schema::create('kegiatan', function (Blueprint $table) {
             $table->id();
             $table->string('nip', 45);
-            $table->string('tugas', 100);
+            $table->enum('tugas', [
+                'Direktur',
+                'Pudir 1',
+                'Pudir 2',
+                'Pudir 3',
+                'Jurusan',
+            ]);
             $table->string('nama_kegiatan', 100);
             $table->date('tanggal');
             $table->time('waktu_mulai');

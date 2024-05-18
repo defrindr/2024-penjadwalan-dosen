@@ -12,14 +12,19 @@ class KegiatanSeeder extends Seeder
      */
     public function run(): void
     {
-        Kegiatan::create([
-            'NIP' => '196201051990031002',
-            'tugas' => 'Tugas Coba',
-            'nama_kegiatan' => 'Kegiatan test',
-            'tanggal' => '2023-01-04',
-            'waktu_mulai' => '10:00:00',
-            'waktu_selesai' => '14:00:00',
-            'surat_tugas' => null,
-        ]);
+        $nips = ['196201051990031002', '197710302005012001'];
+        $tugas_dari = ['Direktur', 'Pudir 1', 'Pudir 2', 'Pudir 3', 'Jurusan'];
+
+        for ($i = 0; $i < 1000; $i++) {
+            Kegiatan::create([
+                'NIP' => $nips[random_int(0, 1)],
+                'tugas' => $tugas_dari[random_int(0, 4)],
+                'nama_kegiatan' => 'Kegiatan ke ' . $i,
+                'tanggal' => date("Y-m-d", strtotime(date("Y-m-d") . " -$i day")),
+                'waktu_mulai' => '10:00:00',
+                'waktu_selesai' => '14:00:00',
+                'surat_tugas' => null,
+            ]);
+        }
     }
 }

@@ -14,6 +14,14 @@ class Kegiatan extends Model
         'nip', 'tugas', 'nama_kegiatan', 'tanggal', 'waktu_mulai', 'waktu_selesai', 'surat_tugas',
     ];
 
+    const PemberiTugas = [
+        'Direktur',
+        'Pudir 1',
+        'Pudir 2',
+        'Pudir 3',
+        'Jurusan',
+    ];
+
     public function dosen()
     {
         return $this->belongsTo(Dosen::class, 'nip', 'nip');

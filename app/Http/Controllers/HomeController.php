@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Dosen;
+use App\Models\Kegiatan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
@@ -25,39 +28,90 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $idUser = auth()->user()->id;
 
-        if ($user->role == 'admin') {
-            return $this->admin();
-        } elseif ($user->role == 'user') {
-            return $this->user();
+        if ($user->role === "user") {
+            $listTugas = Kegiatan::groupBy('tugas')->select('tugas', DB::raw('count(id) as total'))->where('nip', $user->dosen->nip)->orderBy('tugas');
+
+            if ($request->get('date') && $request->get('filter')) {
+                $date = $request->get('date');
+                $filter = $request->get('filter');
+
+                switch ($filter) {
+                    case 1:
+                        $tglAwal = date("Y-m-d", strtotime($date . " -1 month"));
+                        break;
+                    case 2:
+                        $tglAwal = date("Y-m-d", strtotime($date . " -6 month"));
+                        break;
+                    case 3:
+                        $tglAwal = date("Y-m-d", strtotime($date . " -1 year"));
+                        break;
+                    default:
+                        $tglAwal = date("Y-m-d", strtotime($date . " -1 month"));
+                        break;
+                }
+
+                $listTugas->whereBetween('tanggal', [$tglAwal, $date]);
+            }
+
+            $listTugas = $listTugas->get();
+            $listTugasPerdosen = ['labels' => [], 'nilai' => []];
+            foreach ($listTugas as $item) {
+                $listTugasPerdosen['nilai'][] = $item['total'];
+                $listTugasPerdosen['labels'][] = $item['tugas'];
+            }
+            return view('home', [
+                'listNilai' => $listTugasPerdosen['nilai'],
+                'listDosen' => $listTugasPerdosen['labels'],
+            ]);
         }
 
-        return view('home', ['user' => $user]);
+        $listTugas = Kegiatan::groupBy('nip')->select('nip', DB::raw('count(id) as total'))->orderBy('nip');
 
-    }
+        if ($request->get('date') && $request->get('filter')) {
+            $date = $request->get('date');
+            $filter = $request->get('filter');
 
-    public function admin()
-    {
-        $user = Auth::user();
-        $idUser = auth()->user()->id;
+            switch ($filter) {
+                case 1:
+                    $tglAwal = date("Y-m-d", strtotime($date . " -1 month"));
+                    break;
+                case 2:
+                    $tglAwal = date("Y-m-d", strtotime($date . " -6 month"));
+                    break;
+                case 3:
+                    $tglAwal = date("Y-m-d", strtotime($date . " -1 year"));
+                    break;
+                default:
+                    $tglAwal = date("Y-m-d", strtotime($date . " -1 month"));
+                    break;
+            }
 
-        return view('home', ['user' => $user]);
-    }
+            $listTugas->whereBetween('tanggal', [$tglAwal, $date]);
+        }
 
-    public function user()
-    {
-        $user = Auth::user();
-        $idUser = auth()->user()->id;
+        $listTugas = $listTugas->get()->toArray();
 
-        return view('home_user', ['user' => $user]);
-    }
+        $listTugasArr = [];
+        foreach ($listTugas as $tugas) {
+            $listTugasArr[$tugas['nip']] = $tugas['total'];
+        }
 
-    public function pimpinan()
-    {
-        $user = Auth::user();
-        $idUser = auth()->user()->id;
+        $listDosen = Dosen::all();
+        $listTugasPerdosen = ['labels' => [], 'nilai' => []];
+        foreach ($listDosen as $dosen) {
+            $listTugasPerdosen['labels'][] = $dosen->nama_dosen;
+        }
 
-        return view('home_user', ['user' => $user]);
+        foreach ($listDosen as $dosen) {
+            if (isset($listTugasArr[$dosen->nip]))
+                $listTugasPerdosen['nilai'][] = $listTugasArr[$dosen->nip];
+            else $listTugasPerdosen['nilai'][] = 0;
+        }
+
+        return view('home', [
+            'listNilai' => $listTugasPerdosen['nilai'],
+            'listDosen' => $listTugasPerdosen['labels'],
+        ]);
     }
 }
