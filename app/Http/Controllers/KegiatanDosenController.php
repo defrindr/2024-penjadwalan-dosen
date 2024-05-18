@@ -142,6 +142,7 @@ class KegiatanDosenController extends Controller
     public function update(Request $request, string $id)
     {
         $ubah = Kegiatan::findOrFail($id);
+        $old_nip = $ubah->nip;
         $awal = $ubah->surat_tugas;
 
         // Menyimpan perubahan lainnya
@@ -179,6 +180,14 @@ class KegiatanDosenController extends Controller
         }
 
         $ubah->update($dt);
+
+        if ($ubah->nip != $old_nip) {
+            $user = auth()->user();
+            $dosen = Dosen::where('nip', $request->nip)->first();
+            if ($user->role !== "user" && $dosen) {
+                WaSender::send($dosen->telp, "Ada kegiatan baru untuk anda dari {$request->tugas} !!\n\nKreator: {$user->name}");
+            }
+        }
 
         return redirect('kegiatanDosen');
     }

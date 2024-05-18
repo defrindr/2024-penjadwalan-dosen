@@ -33,12 +33,17 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label for="tugas" class="col-sm-2 col-form-label">Tugas:</label>
+                                    <label for="tugas" class="col-sm-2 col-form-label">Tugas Dari:</label>
                                     <div class="col-sm-10">
-                                        <option value="">-- Pilih --</option>
-                                        <option value="pudir">Pudir</option>
-                                        <option value="direktur">Direktur</option>
-                                        <option value="jurusan">Jurusan</option>
+                                        <select name="tugas" id="tugas" class="form-control">
+                                            <option value="">-- Pilih --</option>
+                                            @foreach (\App\Models\Kegiatan::PemberiTugas as $item)
+                                                <option value="{{ $item }}"
+                                                    {{ $kegiatan->tugas == $item ? 'selected' : '' }}>
+                                                    {{ $item }}
+                                                </option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-group row">

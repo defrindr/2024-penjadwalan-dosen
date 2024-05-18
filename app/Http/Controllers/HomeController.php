@@ -32,9 +32,9 @@ class HomeController extends Controller
         if ($user->role === "user") {
             $listTugas = Kegiatan::groupBy('tugas')->select('tugas', DB::raw('count(id) as total'))->where('nip', $user->dosen->nip)->orderBy('tugas');
 
-            if ($request->get('date') && $request->get('filter')) {
-                $date = $request->get('date');
-                $filter = $request->get('filter');
+            if ($request->get('date2') && $request->get('filter2')) {
+                $date = $request->get('date2');
+                $filter = $request->get('filter2');
 
                 switch ($filter) {
                     case 1:
@@ -50,24 +50,55 @@ class HomeController extends Controller
                         $tglAwal = date("Y-m-d", strtotime($date . " -1 month"));
                         break;
                 }
-
                 $listTugas->whereBetween('tanggal', [$tglAwal, $date]);
             }
 
             $listTugas = $listTugas->get();
-            $listTugasPerdosen = ['labels' => [], 'nilai' => []];
+            $listTugasPerdosen2 = ['labels' => [], 'nilai' => []];
             foreach ($listTugas as $item) {
-                $listTugasPerdosen['nilai'][] = $item['total'];
-                $listTugasPerdosen['labels'][] = $item['tugas'];
+                $listTugasPerdosen2['nilai'][] = $item['total'];
+                $listTugasPerdosen2['labels'][] = $item['tugas'];
             }
             return view('home', [
-                'listNilai' => $listTugasPerdosen['nilai'],
-                'listDosen' => $listTugasPerdosen['labels'],
+                'listNilai' => $listTugasPerdosen2['nilai'],
+                'listDosen' => $listTugasPerdosen2['labels'],
             ]);
         }
 
-        $listTugas = Kegiatan::groupBy('nip')->select('nip', DB::raw('count(id) as total'))->orderBy('nip');
+        $listTugas = Kegiatan::groupBy('tugas')->select('tugas', DB::raw('count(id) as total'))->orderBy('tugas');
+        if ($request->get('nip')) {
+            $listTugas->where('nip', $request->get('nip'));
+        }
 
+        if ($request->get('date2') && $request->get('filter2')) {
+            $date = $request->get('date2');
+            $filter = $request->get('filter2');
+
+            switch ($filter) {
+                case 1:
+                    $tglAwal = date("Y-m-d", strtotime($date . " -1 month"));
+                    break;
+                case 2:
+                    $tglAwal = date("Y-m-d", strtotime($date . " -6 month"));
+                    break;
+                case 3:
+                    $tglAwal = date("Y-m-d", strtotime($date . " -1 year"));
+                    break;
+                default:
+                    $tglAwal = date("Y-m-d", strtotime($date . " -1 month"));
+                    break;
+            }
+            $listTugas->whereBetween('tanggal', [$tglAwal, $date]);
+        }
+
+        $listTugas = $listTugas->get();
+        $listTugasPerdosen2 = ['labels' => [], 'nilai' => []];
+        foreach ($listTugas as $item) {
+            $listTugasPerdosen2['nilai'][] = $item['total'];
+            $listTugasPerdosen2['labels'][] = $item['tugas'];
+        }
+
+        $listTugas = Kegiatan::groupBy('nip')->select('nip', DB::raw('count(id) as total'))->orderBy('nip');
         if ($request->get('date') && $request->get('filter')) {
             $date = $request->get('date');
             $filter = $request->get('filter');
@@ -89,7 +120,6 @@ class HomeController extends Controller
 
             $listTugas->whereBetween('tanggal', [$tglAwal, $date]);
         }
-
         $listTugas = $listTugas->get()->toArray();
 
         $listTugasArr = [];
@@ -112,6 +142,8 @@ class HomeController extends Controller
         return view('home', [
             'listNilai' => $listTugasPerdosen['nilai'],
             'listDosen' => $listTugasPerdosen['labels'],
+            'listNilai2' => $listTugasPerdosen2['nilai'],
+            'listDosen2' => $listTugasPerdosen2['labels'],
         ]);
     }
 }

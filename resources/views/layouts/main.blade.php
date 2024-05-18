@@ -248,7 +248,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- AdminLTE for demo purposes -->
     <script src="{{ asset('admin/dist/js/demo.js') }}"></script>
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-    <script src="{{ asset('admin/dist/js/pages/dashboard.js') }}"></script>
+    {{-- <script src="{{ asset('admin/dist/js/pages/dashboard.js') }}"></script> --}}
     <!-- fullCalendar 2.2.5 -->
     <script src="{{ asset('admin/plugins/moment/moment.min.js') }}"></script>
     <script src="{{ asset('admin/plugins/fullcalendar/main.js') }}"></script>
