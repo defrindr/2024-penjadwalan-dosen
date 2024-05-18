@@ -104,7 +104,9 @@
                                 <th>Tanggal</th>
                                 <th>Waktu</th>
                                 <th>Surat Tugas</th>
-                                <th>Aksi</th>
+                                @if (auth()->user()->role !== 'pimpinan')
+                                    <th>Aksi</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -130,17 +132,19 @@
                                             -
                                         @endif
                                     </td>
-                                    <td class="text-center">
-                                        <!-- Edit Button -->
-                                        <a href="{{ route('editKegiatan', $d->id) }}" type="button"
-                                            class="btn btn-sm btn-primary">
-                                            <i class="fas fa-edit"></i></a>
-                                        <!-- Delete Button -->
-                                        <a href="{{ route('deleteKegiatan', $d->id) }}" type="button"
-                                            class="btn btn-sm btn-danger">
-                                            <i class="fas fa-trash-alt"></i></a>
-                                        <!-- ... bagian JavaScript SweetAlert ... -->
-                                    </td>
+                                    @if (auth()->user()->role !== 'pimpinan')
+                                        <td class="text-center">
+                                            <!-- Edit Button -->
+                                            <a href="{{ route('editKegiatan', $d->id) }}" type="button"
+                                                class="btn btn-sm btn-primary">
+                                                <i class="fas fa-edit"></i></a>
+                                            <!-- Delete Button -->
+                                            <a href="{{ route('deleteKegiatan', $d->id) }}" type="button"
+                                                class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash-alt"></i></a>
+                                            <!-- ... bagian JavaScript SweetAlert ... -->
+                                        </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
