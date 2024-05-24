@@ -1,6 +1,6 @@
 import makeWASocket, {
     DisconnectReason,
-    useMultiFileAuthState,
+    useMultiFileAuthState
 } from "@whiskeysockets/baileys";
 
 const { state, saveCreds } = await useMultiFileAuthState("auth_info_baileys");
@@ -39,9 +39,10 @@ async function connectToWhatsApp() {
     sock.ev.on("creds.update", saveCreds);
 
     const sendMessage = async (phone, message) => {
-        
-        let res = await sock.sendMessage(phone + "@s.whatsapp.net", { text: message });
-        console.log("res", res)
+        let res = await sock.sendMessage(phone + "@s.whatsapp.net", {
+            text: message,
+        });
+        console.log("res", res);
     };
 
     return { sock, sendMessage };

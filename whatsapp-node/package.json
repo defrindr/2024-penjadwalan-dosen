@@ -6,13 +6,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "postinstall": "patch-package"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.2",
     "fastify": "^4.27.0",
+    "patch-package": "^8.0.0",
     "qrcode-terminal": "^0.12.0"
   }
 }
