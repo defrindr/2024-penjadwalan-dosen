@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JadwalService;
 use App\Helpers\WaSender;
 use App\Models\Dosen;
 use App\Models\Kegiatan;
@@ -60,7 +61,7 @@ class KegiatanDosenController extends Controller
 
         // Mengambil semua data dosen
         $dosen = Dosen::all();
-      
+
         // Mengirim data ke view 'kegiatanDosen'
         return view('kegiatanDosen', compact('dtKegiatan', 'dosen', 'user'));
     }
@@ -95,6 +96,11 @@ class KegiatanDosenController extends Controller
 
         // Set locale ke bahasa Indonesia
         Carbon::setLocale('id');
+
+        $punyaJadwalLain = JadwalService::checkTabrakan($request->nip, $request->tanggal, $request->waktu_mulai, $request->waktu_selesai);
+        if ($punyaJadwalLain) {
+            return redirect()->back()->withInput()->with('error', 'Jadwal tabrakan');
+        }
 
         // Membuat instance dari model Kegiatan
         $dtKegiatan = new Kegiatan;
@@ -237,22 +243,21 @@ class KegiatanDosenController extends Controller
 
     public function cetakPdf(Request $request)
     {
-    $user = auth()->user(); // Mengambil data user yang sedang login
+        $user = auth()->user(); // Mengambil data user yang sedang login
 
-    // Pastikan bahwa user memiliki relasi dengan dosen
-    $dosen = $user->dosen; 
+        // Pastikan bahwa user memiliki relasi dengan dosen
+        $dosen = $user->dosen;
 
-    if ($user->role === 'dosen') {
-        // Jika user adalah dosen, ambil kegiatan berdasarkan dosen yang sedang login
-        $dtKegiatan = Kegiatan::with('dosen')
-                              ->where('nip', $dosen->nip)
-                              ->get();
-    } else {
-        // Jika user bukan dosen, ambil semua kegiatan
-        $dtKegiatan = Kegiatan::with('dosen')->get();
+        if ($user->role === 'dosen') {
+            // Jika user adalah dosen, ambil kegiatan berdasarkan dosen yang sedang login
+            $dtKegiatan = Kegiatan::with('dosen')
+                ->where('nip', $dosen->nip)
+                ->get();
+        } else {
+            // Jika user bukan dosen, ambil semua kegiatan
+            $dtKegiatan = Kegiatan::with('dosen')->get();
+        }
+
+        return view('kegiatanDosenPdf', compact('dtKegiatan'));
     }
-    
-    return view('kegiatanDosenPdf', compact('dtKegiatan'));
-    }
-    
 }

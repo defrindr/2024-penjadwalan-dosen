@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JadwalService;
 use Illuminate\Http\Request;
 use App\Models\Dosen;
 use App\Models\Jadwal;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class JadwalController extends Controller
 {
@@ -58,13 +60,21 @@ class JadwalController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-        public function store(Request $request)
+    public function store(Request $request)
     {
         $startDate = Carbon::parse($request->tanggal); // Mulai dari tanggal yang diberikan
         $endDate = $startDate->copy()->addMonths(6); // Akhirnya 6 bulan dari tanggal mulai
 
         // Loop setiap minggu sampai akhir tanggal
+        DB::beginTransaction();
+
         while ($startDate->lessThanOrEqualTo($endDate)) {
+            $punyaJadwalLain = JadwalService::checkTabrakan($request->nip, $startDate->format('Y-m-d'), $request->waktu_mulai, $request->waktu_selesai);
+            if ($punyaJadwalLain) {
+                DB::rollBack();
+                return redirect()->back()->withInput()->with('error', 'Jadwal tabrakan pada tanggal ' . $startDate->format('d F Y'));
+            }
+
             Jadwal::create([
                 'nip' => $request->nip,
                 'jadwal' => $request->jadwal,
@@ -76,6 +86,8 @@ class JadwalController extends Controller
             // Tambah satu minggu ke tanggal mulai
             $startDate->addWeek();
         }
+
+        DB::commit();
 
         return redirect('jadwal')->with('success', 'Jadwal berhasil ditambahkan selama 6 bulan.');
     }
