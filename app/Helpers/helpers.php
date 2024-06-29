@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Request;
 if (!function_exists('isActiveKegiatan')) {
     function isActiveKegiatan()
     {
-        return Request::is('kegiatanDosen');
+        return Request::is('jadwal') || Request::is('kegiatanDosen') || Request::is('konfirmasi');
     }
 }
 

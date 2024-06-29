@@ -11,7 +11,8 @@ class Kegiatan extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'nip', 'tugas', 'nama_kegiatan', 'tanggal', 'waktu_mulai', 'waktu_selesai', 'surat_tugas',
+        'nip', 'tugas', 'nama_kegiatan', 'Tempat', 'tanggal', 'waktu_mulai', 'waktu_selesai', 'surat_tugas', 
+        'status_kehadiran', 'keterangan', 'bukti'
     ];
 
     const PemberiTugas = [

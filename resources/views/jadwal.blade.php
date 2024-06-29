@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Kegiatan Dosen')
+@section('title', 'Jadwal Dosen')
 
 @section('content')
     <!-- Main content -->
@@ -8,11 +8,10 @@
         <div class="container-fluid">
             <div class="card">
                 <div class="card-header">@if (auth()->user()->role !== 'pimpinan')
-                    <a href="{{ route('tambahKegiatan') }}" class="btn btn-success btn-sm"> <!-- Tambahkan kelas btn-sm -->
+                    <a href="{{ route('tambahJadwal') }}" class="btn btn-success btn-sm"> <!-- Tambahkan kelas btn-sm -->
                         <i class="fas fa-plus-square"></i> <!-- Ikon -->
-                        <span> Tambah Kegiatan</span> <!-- Teks -->
+                        <span> Tambah Jadwal</span> <!-- Teks -->
                     </a>
-                    <a href="{{ route('kegiatanDosen.cetakPdf') }}" class="btn btn-primary" target="_blank">Cetak PDF</a>
                     @endif
                 </div>
                 <!-- /.card-header -->
@@ -27,48 +26,12 @@
                                             value="{{ request()->get('search') }}">
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="input-group">
-                                        <select name="tugas" id="" class="form-control">
-                                            <option value="">Semua Pemberi Tugas</option>
-                                            @foreach (\App\Models\Kegiatan::PemberiTugas as $item)
-                                                <option value="{{ $item }}"
-                                                    {{ request()->get('tugas') == $item ? 'selected' : '' }}>
-                                                    {{ $item }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" name="daterange"
-                                            placeholder="Search by Date" autocomplete="off"
-                                            value="{{ request()->get('daterange') }}">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-outline-secondary" type="submit">Search</button>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         @else<div class="row">
                                 <div class="col-md-3">
                                     <div class="input-group">
                                         <input type="text" class="form-control" name="search" placeholder="Cari..."
                                             value="{{ request()->get('search') }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="input-group">
-                                        <select name="tugas" id="" class="form-control">
-                                            <option value="">Semua Pemberi Tugas</option>
-                                            @foreach (\App\Models\Kegiatan::PemberiTugas as $item)
-                                                <option value="{{ $item }}"
-                                                    {{ request()->get('tugas') == $item ? 'selected' : '' }}>
-                                                    {{ $item }}
-                                                </option>
-                                            @endforeach
-                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
@@ -83,16 +46,9 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-3">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" name="daterange"
-                                            placeholder="Search by Date" autocomplete="off"
-                                            value="{{ request()->get('daterange') }}">
-                                        <div class="input-group-append">
+                                <div class="input-group-append">
                                             <button class="btn btn-outline-secondary" type="submit">Search</button>
-                                        </div>
                                     </div>
-                                </div>
                             </div>
                         @endif
                     </form>
@@ -101,55 +57,37 @@
                             <tr>
                                 <th class="text-center">No</th>
                                 <th>Nama Dosen</th>
-                                <th>Pemberi Tugas</th>
-                                <th>Nama Kegiatan</th>
-                                <th>Tempat</th>
+                                <th>Matakuliah</th>
                                 <th>Tanggal</th>
                                 <th>Waktu</th>
-                                <th>Surat Tugas</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @if (count($dtKegiatan) == 0)
+                            @if (count($dtJadwal) == 0)
                                 <tr>
                                     <td colspan="8" class="text-center">Tidak ada data</td>
                                 </tr>
                             @endif
-                            @foreach ($dtKegiatan as $index => $d)
-                            @php
-                                \Carbon\Carbon::setLocale('id');
-                            @endphp
+                            @foreach ($dtJadwal as $index => $d)
                                 <tr>
                                     <td class="text-center">{{ $index + 1 }}</td>
                                     <td>{{ optional($d->dosen)->nama_dosen }}</td>
-                                    <td>{{ $d->tugas }}</td>
-                                    <td>{{ $d->nama_kegiatan }}</td>
-                                    <td>{{ $d->Tempat }}</td>
-                                    <!-- <td>{{ readable_date($d->tanggal) }}</td> -->
+                                    <td>{{ $d->jadwal }}</td>
                                     <td>{{ \Carbon\Carbon::parse($d->tanggal)->isoFormat('dddd, DD MMMM YYYY') }}</td>
                                     <td>{{ readable_time($d->waktu_mulai) }} - {{ readable_time($d->waktu_selesai) }}</td>
                                     <!-- Kolom waktu -->
-                                    <td>
-                                        @if ($d->surat_tugas)
-                                            <a href="{{ asset('/pdf/' . $d->surat_tugas) }}" target="_blank"
-                                                rel="noopener noreferrer">Lihat Surat Tugas</a>
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
                                     <td class="text-center">
-                                    @if (auth()->user()->role !== 'pimpinan')
                                         <!-- Edit Button -->
-                                        <a href="{{ route('editKegiatan', $d->id) }}" type="button"
+                                        <a href="{{ route('editJadwal', $d->id) }}" type="button"
                                             class="btn btn-sm btn-primary">
                                             <i class="fas fa-edit"></i></a>
                                         <!-- Delete Button -->
-                                        <a href="{{ route('deleteKegiatan', $d->id) }}" type="button"
+                                        <a href="{{ route('deleteJadwal', $d->id) }}" type="button"
                                             class="btn btn-sm btn-danger">
                                             <i class="fas fa-trash-alt"></i></a>
                                         <!-- ... bagian JavaScript SweetAlert ... -->
-                                        @endif
+                                    
                                     </td>
                                 </tr>
                             @endforeach
@@ -158,7 +96,7 @@
                 </div>
                 <!-- /.card-body -->
                 <div class="card-footer">
-                    {{ $dtKegiatan->links() }}
+                    {{ $dtJadwal->links() }}
                 </div>
             </div>
             <!-- /.card -->

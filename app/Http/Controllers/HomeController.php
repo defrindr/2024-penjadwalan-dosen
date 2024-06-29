@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Dosen;
 use App\Models\Kegiatan;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -139,11 +140,19 @@ class HomeController extends Controller
             else $listTugasPerdosen['nilai'][] = 0;
         }
 
-        return view('home', [
-            'listNilai' => $listTugasPerdosen['nilai'],
-            'listDosen' => $listTugasPerdosen['labels'],
-            'listNilai2' => $listTugasPerdosen2['nilai'],
-            'listDosen2' => $listTugasPerdosen2['labels'],
-        ]);
+         // Query untuk menghitung total dosen
+         $totalDosen = Dosen::count();
+
+         // Query untuk menghitung total kegiatan
+         $totalKegiatan = Kegiatan::count();
+ 
+         return view('home', [
+             'listNilai' => $listTugasPerdosen['nilai'],
+             'listDosen' => $listTugasPerdosen['labels'],
+             'listNilai2' => $listTugasPerdosen2['nilai'],
+             'listDosen2' => $listTugasPerdosen2['labels'],
+             'totalDosen' => $totalDosen,
+             'totalKegiatan' => $totalKegiatan,
+         ]);
     }
 }

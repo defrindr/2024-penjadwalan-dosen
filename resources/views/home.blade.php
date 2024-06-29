@@ -193,7 +193,7 @@
                 datasets: [{
                     label: '# dari Kegiatan',
                     data: {!! json_encode($listNilai) !!},
-                    backgroundColor: '#C44628',
+                    backgroundColor: ['#C44628','#F00', '#25A512', '#81DE87', '#3245DE'],
                     borderWidth: 1
                 }]
             },

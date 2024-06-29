@@ -54,6 +54,13 @@
                                     </div>
                                 </div>
                                 <div class="form-group row">
+                                    <label for="Tempat" class="col-sm-2 col-form-label">Tempat:</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="Tempat" name="Tempat"
+                                        value="{{ $kegiatan->Tempat }}" required>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
                                     <label for="tanggal" class="col-sm-2 col-form-label">Tanggal:</label>
                                     <div class="col-sm-10">
                                         <input type="date" class="form-control" id="tanggal" name="tanggal"

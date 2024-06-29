@@ -1,20 +1,12 @@
 @extends('layouts.main')
 
-@section('title', 'Kegiatan Dosen')
+@section('title', 'Konfirmasi Kegiatan')
 
 @section('content')
     <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
             <div class="card">
-                <div class="card-header">@if (auth()->user()->role !== 'pimpinan')
-                    <a href="{{ route('tambahKegiatan') }}" class="btn btn-success btn-sm"> <!-- Tambahkan kelas btn-sm -->
-                        <i class="fas fa-plus-square"></i> <!-- Ikon -->
-                        <span> Tambah Kegiatan</span> <!-- Teks -->
-                    </a>
-                    <a href="{{ route('kegiatanDosen.cetakPdf') }}" class="btn btn-primary" target="_blank">Cetak PDF</a>
-                    @endif
-                </div>
                 <!-- /.card-header -->
                 <div class="card-body">
                     <form action="" method="GET" class="mb-3">
@@ -29,19 +21,6 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="input-group">
-                                        <select name="tugas" id="" class="form-control">
-                                            <option value="">Semua Pemberi Tugas</option>
-                                            @foreach (\App\Models\Kegiatan::PemberiTugas as $item)
-                                                <option value="{{ $item }}"
-                                                    {{ request()->get('tugas') == $item ? 'selected' : '' }}>
-                                                    {{ $item }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="input-group">
                                         <input type="text" class="form-control" name="daterange"
                                             placeholder="Search by Date" autocomplete="off"
                                             value="{{ request()->get('daterange') }}">
@@ -51,24 +30,12 @@
                                     </div>
                                 </div>
                             </div>
-                        @else<div class="row">
+                        @else
+                            <div class="row">
                                 <div class="col-md-3">
                                     <div class="input-group">
                                         <input type="text" class="form-control" name="search" placeholder="Cari..."
                                             value="{{ request()->get('search') }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="input-group">
-                                        <select name="tugas" id="" class="form-control">
-                                            <option value="">Semua Pemberi Tugas</option>
-                                            @foreach (\App\Models\Kegiatan::PemberiTugas as $item)
-                                                <option value="{{ $item }}"
-                                                    {{ request()->get('tugas') == $item ? 'selected' : '' }}>
-                                                    {{ $item }}
-                                                </option>
-                                            @endforeach
-                                        </select>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
@@ -101,13 +68,14 @@
                             <tr>
                                 <th class="text-center">No</th>
                                 <th>Nama Dosen</th>
-                                <th>Pemberi Tugas</th>
                                 <th>Nama Kegiatan</th>
-                                <th>Tempat</th>
                                 <th>Tanggal</th>
                                 <th>Waktu</th>
-                                <th>Surat Tugas</th>
-                                <th>Aksi</th>
+                                <th>Status Kehadiran</th>
+                                <th>Keterangan</th>
+                                @if (auth()->user()->role === 'user')
+                                    <th>Aksi</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -117,40 +85,80 @@
                                 </tr>
                             @endif
                             @foreach ($dtKegiatan as $index => $d)
-                            @php
-                                \Carbon\Carbon::setLocale('id');
-                            @endphp
                                 <tr>
                                     <td class="text-center">{{ $index + 1 }}</td>
                                     <td>{{ optional($d->dosen)->nama_dosen }}</td>
-                                    <td>{{ $d->tugas }}</td>
                                     <td>{{ $d->nama_kegiatan }}</td>
-                                    <td>{{ $d->Tempat }}</td>
-                                    <!-- <td>{{ readable_date($d->tanggal) }}</td> -->
-                                    <td>{{ \Carbon\Carbon::parse($d->tanggal)->isoFormat('dddd, DD MMMM YYYY') }}</td>
+                                    <td>{{ readable_date($d->tanggal) }}</td>
                                     <td>{{ readable_time($d->waktu_mulai) }} - {{ readable_time($d->waktu_selesai) }}</td>
-                                    <!-- Kolom waktu -->
                                     <td>
-                                        @if ($d->surat_tugas)
-                                            <a href="{{ asset('/pdf/' . $d->surat_tugas) }}" target="_blank"
-                                                rel="noopener noreferrer">Lihat Surat Tugas</a>
+                                        @if (auth()->user()->role === 'user')
+                                            @if ($d->tanggal >= now()->toDateString() && $d->status_kehadiran == 'Hadir')
+                                                <form action="{{ route('konfirmasi.kehadiran', $d->id) }}" method="POST">
+                                                    @csrf
+                                                    <select name="status_kehadiran">
+                                                        @foreach($kegiatanOptions as $option)
+                                                            <option value="{{ $option }}">{{ $option }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                    <button type="submit" class="btn btn-success">Konfirmasi</button>
+                                                </form>
+                                            @else
+                                            <span style="display: inline-block; width: 100%; text-align: center;" class="badge bg-warning">{{ $d->status_kehadiran }}</span>
+                                         @endif
+                                        @else
+                                            <span style="display: inline-block; width: 100%; text-align: center;" class="badge bg-success">{{ $d->status_kehadiran }}</span>
+                                        @endif
+                                    </td>
+                                    <td>{{ $d->keterangan }}
+                                        <br>
+                                        @if ($d->bukti)
+                                        <a href="{{ url('pdf/' . $d->bukti) }}" target="_blank"
+                                                rel="noopener noreferrer">Lihat Bukti</a>
                                         @else
                                             -
                                         @endif
                                     </td>
-                                    <td class="text-center">
-                                    @if (auth()->user()->role !== 'pimpinan')
-                                        <!-- Edit Button -->
-                                        <a href="{{ route('editKegiatan', $d->id) }}" type="button"
-                                            class="btn btn-sm btn-primary">
-                                            <i class="fas fa-edit"></i></a>
-                                        <!-- Delete Button -->
-                                        <a href="{{ route('deleteKegiatan', $d->id) }}" type="button"
-                                            class="btn btn-sm btn-danger">
-                                            <i class="fas fa-trash-alt"></i></a>
-                                        <!-- ... bagian JavaScript SweetAlert ... -->
-                                        @endif
+                                    <!-- Button untuk membuka modal -->
+                                    @if (auth()->user()->role === 'user')
+                                    <td style="text-align: center;">
+                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#konfirmasiModal{{ $d->id }}"  @if($d->keterangan || $d->status_kehadiran == 'Hadir') disabled @endif>
+                                            <i class="fas fa-mail-bulk"></i>
+                                        </button>
+
+                                        <!-- Modal -->
+                                        <div class="modal fade" id="konfirmasiModal{{ $d->id }}" tabindex="-1" aria-labelledby="konfirmasiModalLabel{{ $d->id }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="konfirmasiModalLabel{{ $d->id }}">Konfirmasi Kehadiran</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <form action="{{ route('konfirmasi.upload') }}" method="POST" enctype="multipart/form-data">
+                                                            @csrf
+                                                            <input type="hidden" name="id" value="{{ $d->id }}">
+                                                            <div class="form-group">
+                                                                <label for="keterangan">Keterangan Tidak Menghadiri Kegiatan:</label>
+                                                                <textarea class="form-control" id="keterangan" name="keterangan"></textarea>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label for="bukti">Unggah Bukti (Gambar atau File Lainnya):</label>
+                                                                <input type="file" class="form-control" id="bukti" name="bukti" accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain">
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                                                <button type="submit" class="btn btn-primary">Simpan</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
+                                    @endif
                                 </tr>
                             @endforeach
                         </tbody>
@@ -167,15 +175,14 @@
     </section>
     <!-- /.content -->
 @endsection
-@section('styles')
 
+@section('styles')
     <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
 @endsection
+
 @section('scripts')
     <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
     <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-
-    <!-- Include Date Range Picker -->
     <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
     <script>
         $('input[name="daterange"]').daterangepicker({

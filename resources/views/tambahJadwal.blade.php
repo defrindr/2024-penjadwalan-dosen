@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Tambah Kegiatan')
+@section('title', 'Tambah Jadwal')
 
 @section('content')
     <!-- Main content -->
@@ -11,11 +11,11 @@
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Tambah Kegiatan</h3>
+                            <h3 class="card-title">Tambah Jadwal</h3>
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
-                        <form id="myForm" action="{{ route('simpanKegiatan') }}" method="post"
+                        <form id="myForm" action="{{ route('simpanJadwal') }}" method="post"
                             enctype="multipart/form-data">
                             @csrf
                             <div class="card-body">
@@ -35,31 +35,10 @@
                                     </div>
                                 @endif
                                 <div class="form-group row">
-                                    <label for="tugas" class="col-sm-2 col-form-label">Tugas Dari:</label>
+                                    <label for="jadwal" class="col-sm-2 col-form-label">Matakuliah:</label>
                                     <div class="col-sm-10">
-                                        <select name="tugas" id="tugas" class="form-control">
-                                            <option value="">-- Pilih --</option>
-                                            @foreach (\App\Models\Kegiatan::PemberiTugas as $item)
-                                                <option value="{{ $item }}"
-                                                    {{ request()->get('tugas') == $item ? 'selected' : '' }}>
-                                                    {{ $item }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="nama_kegiatan" class="col-sm-2 col-form-label">Nama Kegiatan:</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="nama_kegiatan" name="nama_kegiatan"
-                                            placeholder="Nama Kegiatan" required>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label for="tempat" class="col-sm-2 col-form-label">Tempat:</label>
-                                    <div class="col-sm-10">
-                                        <input type="text" class="form-control" id="tempat" name="tempat"
-                                            placeholder="Tempat" required>
+                                        <input type="text" class="form-control" id="jadwal" name="jadwal"
+                                            placeholder="jadwal" required>
                                     </div>
                                 </div>
                                 <div class="form-group row">
@@ -79,13 +58,6 @@
                                             value="00:00" required>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <div class="col-sm-10">
-                                        <label for="surat_tugas">Surat Tugas:</label>
-                                        <input type="file" id="surat_tugas" name="surat_tugas">
-                                    </div>
-                                </div>
-                            </div>
                             <!-- /.card-body -->
                             <div class="card-footer">
                                 <button type="submit" class="btn btn-primary">Simpan</button>

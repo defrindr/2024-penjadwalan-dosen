@@ -8,6 +8,8 @@ use App\Models\Kegiatan;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use PDF;
 
 class KegiatanDosenController extends Controller
 {
@@ -48,7 +50,7 @@ class KegiatanDosenController extends Controller
             $dtKegiatan->where('nama_kegiatan', 'like', "%$keyword%");
         }
 
-        $dtKegiatan = $dtKegiatan->orderBy('created_at', 'desc')->paginate(5);
+        $dtKegiatan = $dtKegiatan->orderBy('tanggal', 'desc')->paginate(5);
 
         // Memastikan bahwa $dtKegiatan adalah objek LengthAwarePaginator
         if (!($dtKegiatan instanceof \Illuminate\Pagination\LengthAwarePaginator)) {
@@ -58,7 +60,7 @@ class KegiatanDosenController extends Controller
 
         // Mengambil semua data dosen
         $dosen = Dosen::all();
-
+      
         // Mengirim data ke view 'kegiatanDosen'
         return view('kegiatanDosen', compact('dtKegiatan', 'dosen', 'user'));
     }
@@ -91,11 +93,15 @@ class KegiatanDosenController extends Controller
             $namaFile = null;
         }
 
+        // Set locale ke bahasa Indonesia
+        Carbon::setLocale('id');
+
         // Membuat instance dari model Kegiatan
         $dtKegiatan = new Kegiatan;
         $dtKegiatan->nip = $request->nip;
         $dtKegiatan->tugas = $request->tugas;
         $dtKegiatan->nama_kegiatan = $request->nama_kegiatan;
+        $dtKegiatan->Tempat = $request->Tempat;
         $dtKegiatan->tanggal = $request->tanggal;
         $dtKegiatan->waktu_mulai = $request->waktu_mulai;
         $dtKegiatan->waktu_selesai = $request->waktu_selesai;
@@ -104,14 +110,17 @@ class KegiatanDosenController extends Controller
         // Menyimpan model Kegiatan
         $dtKegiatan->save();
 
+        // Format tanggal untuk ditampilkan dalam Bahasa Indonesia
+        $formattedDate = Carbon::parse($dtKegiatan->tanggal)->locale('id')->isoFormat('dddd, DD MMMM YYYY');
+
         $user = auth()->user();
         $dosen = Dosen::where('nip', $request->nip)->first();
         if ($user->role !== "user" && $dosen) {
-            WaSender::send($dosen->telp, "Ada kegiatan baru untuk anda dari {$request->tugas} !!\n\nKreator: {$user->name}");
+            WaSender::send($dosen->telp, "*Ada kegiatan baru untuk anda dari {$request->tugas}* \n\nTanggal: {$request->tanggal} \n\nHarap untuk melihat sistem penjadwalan untuk informasi selengkapnya dan harap konfirmasi kehadiran jika tidak hadir.
+            \nTerimakasih \n\nKreator: {$user->name}");
         }
 
-
-        return redirect('kegiatanDosen');
+        return redirect('kegiatanDosen')->with('formattedDate', $formattedDate);
     }
 
     // Buat kegiatan baru dengan data yang diterima dari form
@@ -143,6 +152,7 @@ class KegiatanDosenController extends Controller
     {
         $ubah = Kegiatan::findOrFail($id);
         $old_nip = $ubah->nip;
+        $old_tanggal = $ubah->tanggal;
         $awal = $ubah->surat_tugas;
 
         // Menyimpan perubahan lainnya
@@ -150,6 +160,7 @@ class KegiatanDosenController extends Controller
             'nip' => $request['nip'],
             'tugas' => $request['tugas'],
             'nama_kegiatan' => $request['nama_kegiatan'],
+            'Tempat' => $request['Tempat'],
             'tanggal' => $request['tanggal'],
             'waktu_mulai' => $request['waktu_mulai'],
             'waktu_selesai' => $request['waktu_selesai'],
@@ -181,11 +192,12 @@ class KegiatanDosenController extends Controller
 
         $ubah->update($dt);
 
-        if ($ubah->nip != $old_nip) {
+        if ($ubah->nip != $old_nip || $ubah->tanggal != $old_tanggal) {
             $user = auth()->user();
             $dosen = Dosen::where('nip', $request->nip)->first();
             if ($user->role !== "user" && $dosen) {
-                WaSender::send($dosen->telp, "Ada kegiatan baru untuk anda dari {$request->tugas} !!\n\nKreator: {$user->name}");
+                WaSender::send($dosen->telp, "*Update kegiatan baru untuk anda dari {$request->tugas}* \n\nTanggal: {$request->tanggal} \n\nHarap untuk melihat sistem penjadwalan untuk informasi selengkapnya dan harap konfirmasi kehadiran jika tidak hadir. 
+                \nTerimakasih \n\nKreator: {$user->name}");
             }
         }
 
@@ -222,4 +234,25 @@ class KegiatanDosenController extends Controller
 
         return view('kegiatanDosen', compact('dtKegiatan', 'dtDosen'));
     }
+
+    public function cetakPdf(Request $request)
+    {
+    $user = auth()->user(); // Mengambil data user yang sedang login
+
+    // Pastikan bahwa user memiliki relasi dengan dosen
+    $dosen = $user->dosen; 
+
+    if ($user->role === 'dosen') {
+        // Jika user adalah dosen, ambil kegiatan berdasarkan dosen yang sedang login
+        $dtKegiatan = Kegiatan::with('dosen')
+                              ->where('nip', $dosen->nip)
+                              ->get();
+    } else {
+        // Jika user bukan dosen, ambil semua kegiatan
+        $dtKegiatan = Kegiatan::with('dosen')->get();
+    }
+    
+    return view('kegiatanDosenPdf', compact('dtKegiatan'));
+    }
+    
 }

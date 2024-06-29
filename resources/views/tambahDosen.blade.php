@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Dosen')
+@section('title', 'Tambah Data Dosen')
 
 @section('content')
     <!-- Main content -->
@@ -12,7 +12,7 @@
                     <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
-                            <h3 class="card-title">Dosen</h3>
+                            <h3 class="card-title">Tambah Data Dosen</h3>
                         </div>
                         <!-- /.card-header -->
                         <!-- form start -->
@@ -59,10 +59,10 @@
                                 </div>
 
                                 <div class="form-group row">
-                                    <label for="alamat" class="col-sm-2 col-form-label">Alamat:</label>
+                                    <label for="alamat" class="col-sm-2 col-form-label">Homebase:</label>
                                     <div class="col-sm-10">
                                         <input type="text" class="form-control" id="alamat" name="alamat"
-                                            value="{{ old('alamat') }}" Placeholder="alamat" required>
+                                            value="{{ old('alamat') }}" Placeholder="Homebase" required>
                                     </div>
                                 </div>
 

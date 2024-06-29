@@ -53,9 +53,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
             <!-- Brand Logo -->
             <a href="index3.html" class="brand-link">
-                <img src="https://e7.pngegg.com/pngimages/296/364/png-clipart-schedule-employee-scheduling-software-management-computer-software-schedule-miscellaneous-text.png"
+                <img src="https://www.hpi.or.id/wp-content/uploads/2021/08/Logo-Polinema.png"
                     alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-                <span class="brand-text font-weight-light">Penjadwalan</span>
+                <span class="brand-text font-weight-light" style="color: orange;"><b>SIPENKEDOS</b></span>
             </a>
 
             <!-- Sidebar -->
@@ -115,15 +115,35 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             </li>
                         @endif
                         @if (Auth::user()->role == 'admin' || Auth::user()->role == 'user' || Auth::user()->role == 'pimpinan')
-                            <li class="nav-item {{ isActiveKegiatan() ? 'menu-open' : '' }}">
-                                <a href="{{ asset('/kegiatanDosen') }}"
-                                    class="nav-link {{ Request::is('kegiatanDosen') ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-book"></i>
-                                    <p>
-                                        Kegiatan Dosen
-                                    </p>
-                                </a>
-                            </li>
+                        <li class="nav-item {{ isActiveKegiatan() ? 'menu-open' : '' }}">
+                            <a href="javascript:void(0);" class="nav-link {{ isActiveKegiatan() ? 'active' : '' }}">
+                                <i class="nav-icon fas fa-book"></i>
+                                <p>
+                                    Kegiatan
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="{{ asset('/jadwal') }}" class="nav-link {{ Request::is('jadwal') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>JadwalDosen</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ asset('/kegiatanDosen') }}" class="nav-link {{ Request::is('kegiatanDosen') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Kegiatan Dosen</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ asset('/konfirmasi') }}" class="nav-link {{ Request::is('konfirmasi') ? 'active' : '' }}">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Konfirmasi Kegiatan</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
                         @endif
                         <li class="nav-item {{ isActiveLogout() ? 'menu-open' : '' }}">
                             <!-- Menentukan apakah link logout aktif -->

@@ -34,7 +34,7 @@
                                 <th class="text-center">No</th> <!-- Tambahkan class text-center -->
                                 <th>Nama Dosen</th>
                                 <th>No Telepon</th>
-                                <th>Alamat</th>
+                                <th>Homebase</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
