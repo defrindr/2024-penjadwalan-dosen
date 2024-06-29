@@ -248,7 +248,7 @@ class KegiatanDosenController extends Controller
         // Pastikan bahwa user memiliki relasi dengan dosen
         $dosen = $user->dosen;
 
-        if ($user->role === 'dosen') {
+        if ($user->role === 'user') {
             // Jika user adalah dosen, ambil kegiatan berdasarkan dosen yang sedang login
             $dtKegiatan = Kegiatan::with('dosen')
                 ->where('nip', $dosen->nip)
